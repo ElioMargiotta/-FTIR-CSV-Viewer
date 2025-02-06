@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IR-Integrator - EMg</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Manual Integration</h1>
+        <form id="manual-integration-form">
+            <div class="mb-3">
+                <label for="range-min" class="form-label">X Min:</label>
+                <input type="number" class="form-control" id="range-min" name="range_min" placeholder="Enter minimum x-value" required>
+            </div>
+            <div class="mb-3">
+                <label for="range-max" class="form-label">X Max:</label>
+                <input type="number" class="form-control" id="range-max" name="range_max" placeholder="Enter maximum x-value" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Integrate</button>
+        </form>
+        <h3 class="mt-4">Integration Result:</h3>
+        <p id="integration-result">No result yet</p>
+        <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+    </div>
+
+    <script>
+        // Handle form submission for manual integration
+        $("#manual-integration-form").on("submit", function(event) {
+            event.preventDefault();
+
+            const rangeMin = parseFloat($("#range-min").val());
+            const rangeMax = parseFloat($("#range-max").val());
+
+            // Validate input
+            if (isNaN(rangeMin) || isNaN(rangeMax) || rangeMin >= rangeMax) {
+                alert("Please enter a valid range where X Min < X Max.");
+                return;
+            }
+
+            // Send the range to the server via AJAX
+            $.ajax({
+                type: "POST",
+                url: "/manual_integration", // Flask route for manual integration
+                contentType: "application/json",
+                data: JSON.stringify({ range_min: rangeMin, range_max: rangeMax }),
+                success: function(response) {
+                    console.log("Integration result:", response);
+                    $("#integration-result").text("Integrated Value: " + response.integrated_value);
+                },
+                error: function(err) {
+                    console.error("Error during integration:", err);
+                    $("#integration-result").text("Error occurred during integration.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

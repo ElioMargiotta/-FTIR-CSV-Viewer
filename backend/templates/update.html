@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>IR-Integrator - EMg</title>
+<link rel="stylesheet" href="/static/main.css">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Edit File: {{ base_file_name }}</h1>
+
+    <form action="" method="POST">
+        <!-- Keep track of the folder -->
+        <input type="hidden" name="folder" value="{{ folder }}">
+
+        <label for="content">Edit File Name:</label>
+        <input type="text" id="content" name="content" value="{{ base_file_name }}" required>
+
+        <label for="csv_data">Edit File Content:</label>
+        <textarea id="csv_data" name="csv_data" rows="10">{{ csv_data }}</textarea>
+
+        <button type="submit" class="btn-primary">Update</button>
+    </form>
+</div>
+{% endblock %}

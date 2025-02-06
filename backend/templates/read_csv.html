@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>IR-Integrator - EMg</title>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <!-- Graph Section -->
+    <div class="data-graph">
+        <h2>Graph</h2>
+        <div id="plot">
+            {{ plot_html | safe }}
+        </div>
+    </div>
+
+    <!-- Manual Integration Section -->
+    <div class="manual-integration">
+        <h2>Manual Integration</h2>
+        <form id="manual-integration-form">
+            <label for="range-min" class="form-label">X Min:</label>
+            <input type="number" id="range-min" name="range_min" placeholder="Enter minimum x-value" required>
+
+            <label for="range-max" class="form-label">X Max:</label>
+            <input type="number" id="range-max" name="range_max" placeholder="Enter maximum x-value" required>
+
+            <button type="submit">Integrate</button>
+        </form>
+        <h3>Integration Result:</h3>
+        <p id="integration-result">No result yet</p>
+    </div>
+
+    <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+</div>
+
+<script>
+    $("#manual-integration-form").on("submit", function(event) {
+        event.preventDefault();
+
+        const rangeMin = parseFloat($("#range-min").val());
+        const rangeMax = parseFloat($("#range-max").val());
+
+        if (isNaN(rangeMin) || isNaN(rangeMax) || rangeMin >= rangeMax) {
+            alert("Please enter a valid range where X Min < X Max.");
+            return;
+        }
+
+        console.log("Sending data:", { range_min: rangeMin, range_max: rangeMax });
+
+        $.ajax({
+            type: "POST",
+            url: "/manual_integration",
+            contentType: "application/json",
+            data: JSON.stringify({ range_min: rangeMin, range_max: rangeMax }),
+            success: function(response) {
+                console.log("Integration result:", response);
+                $("#integration-result").text("Integrated Value: " + response.integrated_value);
+            },
+            error: function(err) {
+                console.error("Error during integration:", err);
+                $("#integration-result").text("Error occurred during integration.");
+            }
+        });
+    });
+</script>
+{% endblock %}

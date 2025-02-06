@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>IR-Integrator - EMg</title>
+<link rel="stylesheet" href="/static/main.css">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Login to IR-Integrator</h1>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <form action="/login" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit" class="btn-primary">Login</button>
+    </form>
+</div>
+{% endblock %}

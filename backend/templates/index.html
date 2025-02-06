@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>IR-Integrator - EMg</title>
+<link rel="stylesheet" href="/static/main.css">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>IR-Integrator Dashboard</h1>
+
+    <!-- Step 1: Select or Create Folder -->
+    <div class="folder-selection">
+        <h2> Please Select or Create a Folder</h2>
+        <form id="folder-form" method="GET" action="/">
+            <label for="folder">Select Folder:</label>
+            <select name="folder" id="folder" onchange="this.form.submit()">
+                <option value="" disabled {% if not selected_folder %}selected{% endif %}>Select a folder</option>
+                {% for folder in folders %}
+                <option value="{{ folder }}" {% if folder == selected_folder %}selected{% endif %}>{{ folder }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    
+        <!-- Folder Creation -->
+        <form action="/" method="POST">
+            <input type="text" name="new_folder" placeholder="Or create a new folder" required>
+            <button type="submit" class="btn-primary">Create Folder</button>
+        </form>
+        
+        <script>
+            function updateURL() {
+                let folder = document.getElementById('folder').value;
+                if (folder) {
+                    window.location.href = "/?folder=" + encodeURIComponent(folder);
+                }
+            }
+        </script>
+    </div>
+
+
+            <!-- Rename Folder -->
+    {% if selected_folder %}
+    <form action="/rename_folder" method="POST">
+        <input type="hidden" name="old_folder" value="{{ selected_folder }}">
+        <input type="text" name="new_folder" placeholder="New folder name" required>
+        <button type="submit" class="btn-primary">Rename Folder</button>
+    </form>
+
+    <!-- Delete Folder -->
+    <form action="/delete_folder" method="POST" onsubmit="return confirm('Are you sure you want to delete this folder? This action cannot be undone.');">
+        <input type="hidden" name="folder" value="{{ selected_folder }}">
+        <button type="submit" class="btn-danger">Delete Folder</button>
+    </form>
+    {% endif %}
+
+    <!-- Step 3: Upload Files -->
+    {% if selected_folder %}
+    <div class="upload-section">
+        <h2>Upload Files to Folder: {{ selected_folder }}</h2>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="folder" value="{{ selected_folder }}">
+            <input type="file" name="file" id="file-upload" multiple accept=".csv" required>
+            <button type="submit" class="btn-primary">Upload Files</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Step 2: Display Files in Selected Folder -->
+    {% if selected_folder %}
+    <div class="file-list-section">
+        <h2>Files in Folder: {{ selected_folder }}</h2>
+        <form action="/plot_combined" method="POST">
+            <input type="hidden" name="selected_folder" value="{{ selected_folder }}">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>File Name</th>
+                        <th>Date Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selected_files" value="{{ task.content }}">
+                        </td>
+                        <td>{{ task.content.split('/') [-1] }}</td>
+                        <td>{{ task.date_created.date() }}</td>
+                        <td>
+                            <a href="/delete/{{ task.id }}" class="btn btn-small">Delete</a>
+                            <a href="/update/{{ task.id }}" class="btn btn-small">Edit</a>
+                            <a href="/read_csv/{{ task.id }}" class="btn btn-small">Integrate Peaks</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn-primary">Plot Combined Graph</button>
+        </form>
+    </div>
+    {% endif %}
+
+<!-- Logout Button (Only visible if logged in) -->
+    <div class="logout-section">
+        <a href="/logout" class="btn-danger">🚪 Logout</a>
+    </div>
+
+</div>
+{% endblock %}

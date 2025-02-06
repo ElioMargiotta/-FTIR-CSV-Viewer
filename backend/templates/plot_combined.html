@@ -1,0 +1,17 @@
+
+
+{% extends "base.html" %}
+
+{% block head %}
+<title>IR-Integrator - EMg</title>
+<link rel="stylesheet" href="/static/main.css">
+{% endblock %}
+
+{% block body %}
+<div class="container-plot">
+    <h1>Combined Plot of Selected Files</h1>
+    <div class="plot-container">
+        <img src="{{ plot_path }}" alt="Combined Plot" class="img-fluid">
+    </div>
+</div>
+{% endblock %}
